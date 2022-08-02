@@ -37,7 +37,12 @@
 				<div class="hot">
 					<Header></Header>
 					<div class="hot-content">
-						<div class="item" v-for="(item, idx) in hitSongList" :key="idx">
+						<div
+							class="item"
+							v-for="(item, idx) in hitSongList"
+							:key="idx"
+							@click="playListBtn"
+						>
 							<img :src="item.coverImgUrl" :alt="item.name" />
 							<p>{{ item.name }}</p>
 							<div class="bottom">
@@ -151,6 +156,17 @@
 		<div class="fixed">
 			<a href="#"></a>
 		</div>
+		<ul class="nav">
+			<li>1</li>
+			<li>2</li>
+			<li>3</li>
+			<li>4</li>
+			<li>5</li>
+			<li>6</li>
+			<li>7</li>
+			<li>8</li>
+			<li>{{ count }}</li>
+		</ul>
 	</div>
 </template>
 
@@ -206,8 +222,6 @@ export default {
 					bgColor: "#5d78ab",
 				},
 			],
-			discData: [1, 2, 3, 4, 5],
-			listData: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 			singerData: [1, 2, 3, 4, 5],
 			num: 0,
 			timer: null,
@@ -343,6 +357,9 @@ export default {
 			this.discLeftFlag = false
 			this.discRightFlag = true
 		},
+		playListBtn() {
+			this.$router.push("/playlist")
+		},
 	},
 
 	computed: {
@@ -352,6 +369,11 @@ export default {
 			"allToplist",
 			"AllPlaylistTrack",
 		]),
+		count() {
+			return this.imgData.map((item) => {
+				return { ...item, flag: item.flag === true ? 1 : 2 }
+			})
+		},
 	},
 
 	components: {
@@ -460,6 +482,7 @@ export default {
 						margin-top: 10px;
 						width: 140px;
 						height: 204px;
+						cursor: pointer;
 						img {
 							width: 140px;
 							height: 140px;
@@ -754,6 +777,11 @@ export default {
 		}
 		a:hover {
 			background-position: -325px -46px;
+		}
+	}
+	.nav {
+		li:nth-child(3n) {
+			color: red;
 		}
 	}
 }
