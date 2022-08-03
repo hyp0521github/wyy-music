@@ -65,16 +65,18 @@
 					<Header title="新碟上架" :isShowNav="false"></Header>
 					<div class="content">
 						<a class="left" @click="discLeftBtn"></a>
-						<div class="middle">
+						<div class="middle" ref="middleDisc">
 							<div
 								:class="{
 									items: true,
-									leftScroll: discLeftFlag,
-									rightScroll: discRightFlag,
 								}"
-								ref="items"
+								ref="itemsDisc"
 							>
-								<div class="item" v-for="item in newAlbumList" :key="item.id">
+								<div
+									class="item"
+									v-for="(item, index) in newAlbumList"
+									:key="index"
+								>
 									<em v-if="discId === item.id"></em>
 									<img :src="item.blurPicUrl" alt="1" />
 									<i @mouseover="bfOverBtn(item.id)" @mouseout="bfOutBtn"></i>
@@ -89,17 +91,26 @@
 				<div class="list">
 					<Header title="榜单" :isShowNav="false"></Header>
 					<div class="content">
+						<!-- 使用短路运算符运算：当allToplist[0]还没有数据时，虚拟DOM就已经加载了，
+						所以报错，但是页面还是加载了，因为当created调用时就给allTopslist赋值了，
+						使用短路运算符运算在他还没加载之前使用一个空的数组，这样子就不报错 -->
 						<HomeListItem
-							:headerData="allToplist[0]"
-							:AllPlaylistTrack="AllPlaylistTrack.slice(0, 10)"
+							:headerData="allToplist[0] || defaultHeadData"
+							:AllPlaylistTrack="
+								AllPlaylistTrack.slice(0, 10) || defaultAllPlaylistTrack
+							"
 						></HomeListItem>
 						<HomeListItem
-							:headerData="allToplist[1]"
-							:AllPlaylistTrack="AllPlaylistTrack.slice(10, 20)"
+							:headerData="allToplist[1] || defaultHeadData"
+							:AllPlaylistTrack="
+								AllPlaylistTrack.slice(10, 20) || defaultAllPlaylistTrack
+							"
 						></HomeListItem>
 						<HomeListItem
-							:headerData="allToplist[2]"
-							:AllPlaylistTrack="AllPlaylistTrack.slice(20, 30)"
+							:headerData="allToplist[2] || defaultHeadData"
+							:AllPlaylistTrack="
+								AllPlaylistTrack.slice(20, 30) || defaultAllPlaylistTrack
+							"
 						></HomeListItem>
 					</div>
 				</div>
@@ -156,17 +167,6 @@
 		<div class="fixed">
 			<a href="#"></a>
 		</div>
-		<ul class="nav">
-			<li>1</li>
-			<li>2</li>
-			<li>3</li>
-			<li>4</li>
-			<li>5</li>
-			<li>6</li>
-			<li>7</li>
-			<li>8</li>
-			<li>{{ count }}</li>
-		</ul>
 	</div>
 </template>
 
@@ -230,16 +230,23 @@ export default {
 			isShowBf: false,
 			discId: 0,
 			// 控制disc的滚动
-			discLeftFlag: false,
-			discRightFlag: false,
+			discNum: 2,
+			defaultAllPlaylistTrack: [
+				{
+					name: "",
+				},
+			],
+			defaultHeadData: [
+				{
+					coverImgUrl: "",
+					name: "",
+				},
+			],
 		}
 	},
 
 	created() {
 		this.timerBtn()
-		for (let i = 0; i <= this.allToplist.length - 1; i++) {
-			this.$store.dispatch("getAllPlaylistTrack", this.allToplist[i].id)
-		}
 	},
 
 	methods: {
@@ -349,13 +356,41 @@ export default {
 		bfOutBtn() {
 			this.discId = 0
 		},
+		discMove() {
+			const itemsDisc = this.$refs.itemsDisc
+			const middleDiscWidth = this.$refs.middleDisc.offsetWidth + 8
+			let scrollLeft = middleDiscWidth * this.discNum
+			itemsDisc.style.transition = "all 1s linear"
+			itemsDisc.style.transform = `translateX(-${scrollLeft}px)`
+		},
 		discLeftBtn() {
-			this.discRightFlag = false
-			this.discLeftFlag = true
+			const itemsDisc = this.$refs.itemsDisc
+			const middleDiscWidth = this.$refs.middleDisc.offsetWidth + 8
+			this.discNum--
+
+			if (this.discNum < 0) {
+				this.discNum = 2
+				itemsDisc.style.transition = "none"
+				itemsDisc.style.transform = `translateX(-${
+					this.discNum * middleDiscWidth
+				}px)`
+				this.discNum = 1
+			}
+			this.discMove()
 		},
 		discRightBtn() {
-			this.discLeftFlag = false
-			this.discRightFlag = true
+			const itemsDisc = this.$refs.itemsDisc
+			const middleDiscWidth = this.$refs.middleDisc.offsetWidth + 8
+			this.discNum++
+			if (this.discNum > 2) {
+				this.discNum = 0
+				itemsDisc.style.transition = "none"
+				itemsDisc.style.transform = `translateX(-${
+					this.discNum * middleDiscWidth
+				}px)`
+				this.discNum = 1
+			}
+			this.discMove()
 		},
 		playListBtn() {
 			this.$router.push("/playlist")
@@ -556,16 +591,9 @@ export default {
 					.items {
 						width: 2000px;
 						height: 141px;
-						transform: translateX(0);
-						transition: all 0.5s ease;
+						transform: translateX(-1268px);
+						transition: all 0.5s linear;
 					}
-					.leftScroll {
-						transform: translateX(-634px);
-					}
-					.rightScroll {
-						transform: translateX(0);
-					}
-
 					.item {
 						width: 100px;
 						height: 141px;
@@ -628,6 +656,7 @@ export default {
 					}
 					.left {
 						left: 7px;
+						z-index: 100;
 					}
 					.left:hover {
 						background-position: -280px -75px;
@@ -635,6 +664,7 @@ export default {
 					.right {
 						right: 9px;
 						background-position: -300px -75px;
+						z-index: 100;
 					}
 					.right:hover {
 						background-position: -320px -75px;

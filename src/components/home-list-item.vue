@@ -4,13 +4,10 @@
 			<!-- dt就相当于头部 dd相当于内容 -->
 			<dt class="top">
 				<div class="left">
-					<img
-						:src="headerData.coverImgUrl && headerData.coverImgUrl"
-						:alt="headerData.name"
-					/>
+					<img :src="headerData.coverImgUrl" :alt="headerData.name" />
 				</div>
 				<div class="right">
-					<h4>{{ headerData.name && headerData.name }}</h4>
+					<h4>{{ headerData.name }}</h4>
 					<div class="btn">
 						<a href="#" class="a_l"></a>
 						<a href="#" class="a_r"></a>

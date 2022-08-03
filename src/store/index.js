@@ -57,21 +57,47 @@ export default new Vuex.Store({
     async getNewAlbum(context) {
       getNewAlbum({ area: 'ZH', limit: 10}).then(res => {
         const { albums } = res
+        const newAlbums = albums.slice(0, 5)
+        albums.push(...newAlbums)
         context.commit('setNewAlbum', albums)
       })
     },
     // 获取所有榜单接口地址
     async getAllToplist(context) {
+      // console.error("这是一个错误信息")
+      // console.info("这是一个info信息")
+      // console.warn("这是一个warn信息")
+      // console.debug("这是一个错误信息")
+      // // %c表示用style来代替
+      // console.log('%c You just Won! a lottry', 'color: #bada55; background: #222');
+      
+      // 打印JSON对象
+      // console.dir({"name": "hyp", "age": 18})
+      // 打印函数调用次数
+      // for (let i = 0; i < 5; i++) {
+      //   console.count()
+      // }
+      // 追踪函数调用轨迹
+      // function b() {
+      //   a()
+      // }
+      // b()
+      // function a() {
+      //   console.trace()
+      // }
+      // 测试调用getAllToplist用的时间
+      // console.time("this");
       const res = await getAllToplist()
+      // console.timeEnd("this");
       const { list } = res
       const newList = list.splice(0, 3)
       context.commit('setAllToplist', newList)
+      // 根据榜单id请求歌曲数据
+      for (let i = 0; i <= context.state.allToplist.length - 1; i++) {
+			  const { songs } = await getAllPlaylistTrack({ id: context.state.allToplist[i].id, limit: 10 })
+        context.commit('setAllPlaylistTrack', songs)
+		  }  
     },
-    // 获取歌单所有歌曲
-    async getAllPlaylistTrack(context, playload) {
-      const { songs } = await getAllPlaylistTrack({ id: playload, limit: 10 })
-      context.commit('setAllPlaylistTrack', songs)
-    }
   },
   getters: {
     cookie: state => state.cookie,
