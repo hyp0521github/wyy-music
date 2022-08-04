@@ -64,7 +64,11 @@
 				<div class="new-disc">
 					<Header title="新碟上架" :isShowNav="false"></Header>
 					<div class="content">
-						<a class="left" @click="discLeftBtn"></a>
+						<a
+							class="left"
+							@click="discLeftBtn"
+							:style="{ pointerEvents: pointerEvents }"
+						></a>
 						<div class="middle" ref="middleDisc">
 							<div
 								:class="{
@@ -85,7 +89,11 @@
 								</div>
 							</div>
 						</div>
-						<a class="right" @click="discRightBtn"></a>
+						<a
+							class="right"
+							@click="discRightBtn"
+							:style="{ pointerEvents: pointerEvents }"
+						></a>
 					</div>
 				</div>
 				<div class="list">
@@ -174,6 +182,7 @@
 import Header from "@/components/header.vue"
 import { mapGetters } from "vuex"
 import HomeListItem from "@/components/home-list-item.vue"
+import { throttle } from "lodash"
 
 export default {
 	name: "WorkspaceHome",
@@ -242,6 +251,13 @@ export default {
 					name: "",
 				},
 			],
+			arr: [1, 2, 3],
+			obj: {
+				name: "hyp",
+				age: 18,
+			},
+			// 禁止鼠标点击事件
+			pointerEvents: "",
 		}
 	},
 
@@ -356,6 +372,7 @@ export default {
 		bfOutBtn() {
 			this.discId = 0
 		},
+		// 控制disc左右滑动
 		discMove() {
 			const itemsDisc = this.$refs.itemsDisc
 			const middleDiscWidth = this.$refs.middleDisc.offsetWidth + 8
@@ -363,11 +380,15 @@ export default {
 			itemsDisc.style.transition = "all 1s linear"
 			itemsDisc.style.transform = `translateX(-${scrollLeft}px)`
 		},
-		discLeftBtn() {
+		// disc左按钮
+		discLeftBtn: throttle(function () {
+			// this.disabledBtn()
+			this.leftBtn()
+		}, 1000),
+		leftBtn() {
 			const itemsDisc = this.$refs.itemsDisc
 			const middleDiscWidth = this.$refs.middleDisc.offsetWidth + 8
 			this.discNum--
-
 			if (this.discNum < 0) {
 				this.discNum = 2
 				itemsDisc.style.transition = "none"
@@ -378,7 +399,9 @@ export default {
 			}
 			this.discMove()
 		},
+		// disc右按钮
 		discRightBtn() {
+			this.disabledBtn()
 			const itemsDisc = this.$refs.itemsDisc
 			const middleDiscWidth = this.$refs.middleDisc.offsetWidth + 8
 			this.discNum++
@@ -392,8 +415,22 @@ export default {
 			}
 			this.discMove()
 		},
+		// 禁用点击按钮
+		disabledBtn() {
+			this.pointerEvents = "none"
+			// setTimeout如果写普通函数是调用不到this的，
+			// 普通函数里面的this指向的是window
+			setTimeout(() => {
+				this.pointerEvents = ""
+			}, 1000)
+		},
 		playListBtn() {
-			this.$router.push("/playlist")
+			this.$router.push({
+				path: "/playlist",
+				query: {
+					id: 5659832889,
+				},
+			})
 		},
 	},
 

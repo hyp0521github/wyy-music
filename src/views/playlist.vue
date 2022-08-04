@@ -1,5 +1,9 @@
 <template>
-	<div>我是playlist</div>
+	<div>
+		我是playlist
+		{{ $route.query.id }}
+		{{ id }}
+	</div>
 </template>
 
 <script>
@@ -11,6 +15,12 @@ export default {
 	},
 
 	mounted() {},
+
+	computed: {
+		id() {
+			return this.$route.query.id
+		},
+	},
 
 	methods: {},
 }
