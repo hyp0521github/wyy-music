@@ -59,6 +59,23 @@
 			</div>
 		</div>
 		<router-view />
+		<div class="playVideo" ref="playVideo">
+			<div class="icon">
+				<a href="javascript:;" hidefocus="true"></a>
+			</div>
+			<div class="audio">
+				<button class="play" @click="playAudio">
+					<a href="javascript:;" ref="audioBtn"></a>
+				</button>
+				<audio ref="audio" src="@/assets/y1060.mp3"></audio>
+				<div class="progress">
+					<div class="left">
+						<span></span>
+					</div>
+					<div class="right"></div>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -122,7 +139,10 @@ export default {
 				},
 			],
 			ifLabelShow: true,
+			// 控制登录弹窗隐显
 			isShowDialog: false,
+			// 控制播放暂停
+			isShowPlay: true,
 		}
 	},
 
@@ -130,6 +150,23 @@ export default {
 		this.$store.dispatch("getTopPlayListSong")
 		this.$store.dispatch("getNewAlbum")
 		this.$store.dispatch("getAllToplist")
+		const elemtHeight = parseInt(document.documentElement.clientHeight)
+		document.onmousemove = (event) => {
+			event = event || window.event
+			if (
+				event.clientY >= elemtHeight - 54 &&
+				event.clientY <= elemtHeight - 5
+			) {
+				this.$refs.playVideo.classList.add("active")
+			} else {
+				setTimeout(() => {
+					this.$refs.playVideo.classList.remove("active")
+				}, 1000)
+			}
+		}
+		// console.log(`浏览器body的可视窗口为${document.body.clientWidth}`)
+		// console.log(`浏览器可视窗口高为${document.body.clientHeight}`)
+		// console.log(`浏览器可视窗口搞为${document.documentElement.clientHeight}`)
 	},
 
 	methods: {
@@ -158,6 +195,18 @@ export default {
 		// 手机号登录
 		pLoginBtn() {
 			this.$store.dispatch("login")
+		},
+		// 音乐播放按钮
+		playAudio() {
+			this.isShowPlay = !this.isShowPlay
+			const audioBtn = this.$refs.audioBtn
+			if (this.isShowPlay) {
+				this.$refs.audio.play()
+				audioBtn.classList.add("pause")
+			} else {
+				this.$refs.audio.pause()
+				audioBtn.classList.remove("pause")
+			}
 		},
 	},
 	computed: {
@@ -430,4 +479,93 @@ export default {
 		}
 	}
 }
+.playVideo {
+	position: fixed;
+	right: 0;
+	bottom: 0px;
+	transition: transform 0.3s ease;
+	transform: translateY(0px);
+	.icon {
+		position: absolute;
+		top: -14px;
+		right: 0;
+		width: 52px;
+		height: 22px;
+		background: url("~@/assets/playbar.png") no-repeat;
+		background-position: 1px 64%;
+		a {
+			position: absolute;
+			top: 6px;
+			left: 18px;
+			display: block;
+			width: 17px;
+			height: 19px;
+			background: url("~@/assets/playbar.png") no-repeat;
+			background-position: -80px 64%;
+		}
+		a:hover {
+			background-position: -80px -402px;
+		}
+	}
+	.audio {
+		position: relative;
+		width: 100vw;
+		height: 54px;
+		background: url("~@/assets/playbar.png") 0px 0px;
+		.play {
+			a {
+				position: absolute;
+				top: 12px;
+				left: 306px;
+				width: 36px;
+				height: 37px;
+				background: url("~@/assets/playbar.png") no-repeat -1px -204px;
+			}
+			a:hover {
+				background: url("~@/assets/playbar.png") no-repeat -41px -204px;
+			}
+			a.pause {
+				background-position: -1px -165px;
+			}
+			a.pause:hover {
+				background-position: -41px -165px;
+			}
+		}
+		.progress {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			position: absolute;
+			top: 0;
+			left: 400px;
+			height: 116%;
+			.left {
+				position: absolute;
+				top: 21px;
+				left: -1px;
+				width: 20px;
+				height: 20px;
+				span {
+					display: block;
+					width: 20px;
+					height: 20px;
+					background: url("~@/assets/iconall.png") no-repeat -1px -252px;
+				}
+				span:hover {
+					background-position: -1px -282px;
+				}
+			}
+			.right::after {
+				display: block;
+				content: "";
+				width: 466px;
+				height: 9px;
+				background: url("~@/assets/statbar.png") no-repeat 0 0;
+			}
+		}
+	}
+}
+// .playVideo.active {
+// 	transform: translateY(0px);
+// }
 </style>
