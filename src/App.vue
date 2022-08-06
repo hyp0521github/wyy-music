@@ -69,10 +69,17 @@
 				</button>
 				<audio ref="audio" src="@/assets/y1060.mp3"></audio>
 				<div class="progress">
-					<div class="left">
+					<div
+						class="left"
+						:style="{ left: `${progress}px` }"
+						ref="leftBtn"
+						@mousedown="mousedown"
+					>
 						<span></span>
 					</div>
-					<div class="right"></div>
+					<div class="right" ref="w_progress">
+						<span ref="r_s"></span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -143,6 +150,8 @@ export default {
 			isShowDialog: false,
 			// 控制播放暂停
 			isShowPlay: true,
+			// 进度条进度
+			progress: 0,
 		}
 	},
 
@@ -150,18 +159,20 @@ export default {
 		this.$store.dispatch("getTopPlayListSong")
 		this.$store.dispatch("getNewAlbum")
 		this.$store.dispatch("getAllToplist")
-		const elemtHeight = parseInt(document.documentElement.clientHeight)
+		// 可视窗口的高
+		const elemtHeight = document.documentElement.clientHeight
+
 		document.onmousemove = (event) => {
 			event = event || window.event
 			if (
-				event.clientY >= elemtHeight - 54 &&
+				event.clientY >= elemtHeight - 60 &&
 				event.clientY <= elemtHeight - 5
 			) {
+				this.$refs.playVideo.style.transition = "transform 0.5s ease"
 				this.$refs.playVideo.classList.add("active")
 			} else {
-				setTimeout(() => {
-					this.$refs.playVideo.classList.remove("active")
-				}, 1000)
+				this.$refs.playVideo.style.transition = "transform 0.5s ease 2s"
+				this.$refs.playVideo.classList.remove("active")
 			}
 		}
 		// console.log(`浏览器body的可视窗口为${document.body.clientWidth}`)
@@ -206,6 +217,32 @@ export default {
 			} else {
 				this.$refs.audio.pause()
 				audioBtn.classList.remove("pause")
+			}
+		},
+		// 点击鼠标拖动进度条
+		mousedown(e) {
+			// 当我们拖拽一个网页中的内容时，浏览器会默认去搜索引擎中搜索内容，此时会导致拖拽功能的异常，这个是浏览器提供的一个默认行为，
+			// 取消浏览器默认行为
+			e.preventDefault()
+
+			// 鼠标事件注册在容器上，只要鼠标离开这个容器
+			// 鼠标松开事件就不触发了，所以应该在window上注册
+			// 鼠标松开事件 window.onmouseup = () => {}
+
+			// 鼠标移动事件应该绑定在window或者document上面
+			const w_progress = this.$refs.w_progress.offsetWidth
+
+			window.onmousemove = (event) => {
+				event = event || window.event
+				let x = event.clientX - this.$refs.leftBtn.offsetParent.offsetLeft + 10
+				if (x >= -10 && x <= w_progress) {
+					this.$refs.r_s.style.width = `${x + 10}px`
+					this.progress = x
+				}
+			}
+			// 当按键松开时，清除鼠标移动事件
+			window.onmouseup = () => {
+				window.onmousemove = null
 			}
 		},
 	},
@@ -482,9 +519,9 @@ export default {
 .playVideo {
 	position: fixed;
 	right: 0;
-	bottom: 0px;
-	transition: transform 0.3s ease;
-	transform: translateY(0px);
+	bottom: 0;
+	transform: translateY(54px);
+	transition: transform 0.5s ease;
 	.icon {
 		position: absolute;
 		top: -14px;
@@ -542,9 +579,10 @@ export default {
 			.left {
 				position: absolute;
 				top: 21px;
-				left: -1px;
+				left: 0px;
 				width: 20px;
 				height: 20px;
+				z-index: 100;
 				span {
 					display: block;
 					width: 20px;
@@ -555,17 +593,31 @@ export default {
 					background-position: -1px -282px;
 				}
 			}
-			.right::after {
-				display: block;
-				content: "";
+			.right {
 				width: 466px;
 				height: 9px;
+				span {
+					position: absolute;
+					top: 27px;
+					left: 0;
+					width: 0;
+					height: 100%;
+					background: url("~@/assets/statbar.png") no-repeat 0px -66px;
+					transition: width linear;
+				}
+			}
+			.right::after {
+				content: "";
+				display: block;
+				width: 100%;
+				height: 100%;
 				background: url("~@/assets/statbar.png") no-repeat 0 0;
 			}
 		}
 	}
 }
-// .playVideo.active {
-// 	transform: translateY(0px);
-// }
+.playVideo.active {
+	transform: translateY(0px);
+	visibility: visible;
+}
 </style>

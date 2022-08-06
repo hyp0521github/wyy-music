@@ -32,10 +32,7 @@
     "vue-template-compiler": "^2.6.11"
   },
   "main": "vue.config.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyp0521github/wyy-music.git"
-  },
+  "repository": "git+https://github.com/hyp0521github/wyy-music.git",
   "author": "",
   "license": "ISC",
   "bugs": {
