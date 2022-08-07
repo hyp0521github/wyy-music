@@ -83,6 +83,8 @@
 				</div>
 			</div>
 		</div>
+		<div class="kj">11</div>
+		<div class="bkj">22</div>
 	</div>
 </template>
 
@@ -168,7 +170,7 @@ export default {
 				event.clientY >= elemtHeight - 60 &&
 				event.clientY <= elemtHeight - 5
 			) {
-				this.$refs.playVideo.style.transition = "transform 0.5s ease"
+				this.$refs.playVideo.style.transition = "transform ease"
 				this.$refs.playVideo.classList.add("active")
 			} else {
 				this.$refs.playVideo.style.transition = "transform 0.5s ease 2s"
@@ -177,7 +179,7 @@ export default {
 		}
 		// console.log(`浏览器body的可视窗口为${document.body.clientWidth}`)
 		// console.log(`浏览器可视窗口高为${document.body.clientHeight}`)
-		// console.log(`浏览器可视窗口搞为${document.documentElement.clientHeight}`)
+		// console.log(`浏览器可视窗口高为${document.documentElement.clientHeight}`)
 	},
 
 	methods: {
@@ -520,8 +522,8 @@ export default {
 	position: fixed;
 	right: 0;
 	bottom: 0;
-	transform: translateY(54px);
-	transition: transform 0.5s ease;
+	transform: translateY(45px);
+	transition: transform ease;
 	.icon {
 		position: absolute;
 		top: -14px;
@@ -619,5 +621,16 @@ export default {
 .playVideo.active {
 	transform: translateY(0px);
 	visibility: visible;
+}
+.kj {
+	width: 300px;
+	height: 300px;
+	background-color: red;
+	visibility: hidden;
+}
+.bkj {
+	width: 300px;
+	height: 300px;
+	background-color: yellow;
 }
 </style>

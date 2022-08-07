@@ -172,7 +172,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="fixed">
+		<div class="fixed" ref="fixed">
 			<a href="#"></a>
 		</div>
 	</div>
@@ -263,6 +263,14 @@ export default {
 
 	created() {
 		this.timerBtn()
+		//当文档滚动时事件自动发生
+		window.onscroll = () => {
+			if (document.documentElement.scrollTop > 1) {
+				this.$refs.fixed.style.display = "block"
+			} else {
+				this.$refs.fixed.style.display = "none"
+			}
+		}
 	},
 
 	methods: {
@@ -833,6 +841,7 @@ export default {
 		}
 	}
 	.fixed {
+		display: none;
 		a {
 			position: fixed;
 			top: 311px;
